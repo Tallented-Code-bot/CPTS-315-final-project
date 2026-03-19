@@ -1,12 +1,58 @@
 
 \maketitle
 
-\begin{multicols}{2}
 
-\section*{Introduction}
-\section*{Dataset}
-\section*{Methodology}
-\section*{Limitations}
-\section*{Summary}
+\section{Introduction}
 
-\end{multicols}
+Although the game ``rock, paper, scissors'' is often used as a random decider,
+similar to a coin, it is in fact possible to win more consistently than
+randomness would predict. This project uses data mining to construct an agent
+that learns from prior games with its opponent, and then uses that information
+to win games through predicion.
+
+
+Our methodology involves steady learning, and near-continous
+retraining in order to achieve the effect of an opponent that learns
+as it plays. Part of the motivation and significance of this project
+comes as an attempt to understand the processes people use to make decisions
+where opponent prediction and ``randomness'' are rewarded factors.
+
+
+\section{Data Collection}
+
+There is no pre-constructed dataset that we can use for this project. Instead,
+we will be collecting our own data by recording series' of rock paper scissors
+games, both between two humans, and between a single human and the model. For
+each game, we will collect the game id, which item each opponent played (one of
+rock, paper, or scissors), and the result.
+
+
+
+\section{Technical Approach}
+The predicion model will take an input of every previously played game in the
+session, and use the combination of the user input and our model's previously
+generated predicted input, to determine it's next response. For this, we plan,
+so far, to use a combination of a simple ``most common pick'' (uses the most
+picked item), and an implementation of the the apriori algorithm to attempt to
+find patterns in the user's previous responses.
+
+
+There is a slight challenge of always collecting data, in that you need to pick
+a time to train the model. The first idea for this was to recalculate our Apriori
+and ``most common pick'' every few runs of the algorithm, although with how
+light our data is, it is also possible to do it every run.
+
+\section{Evaluation Methodology}
+It should be fairly simple to evaluate the success of the model. The main
+variable we care about is simply the win rate --- how often the model wins its
+game. We will also look at the number of games it takes to start winning more
+consistently; we want it to take fewer games to ``warm up''.
+
+
+% win rate
+% total wins
+% games it takes to get to a good win rate
+
+
+\section{Results and Discussion}
+We don't have any results yet, since we have not begun work on the project.
