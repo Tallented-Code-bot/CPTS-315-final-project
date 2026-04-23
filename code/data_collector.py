@@ -1,67 +1,123 @@
 # test
+import pickle
 from random import random
 from typing import Annotated
 
+import algorithms
 import numpy as np
 import pandas as pd
 from numpy.typing import NDArray
 
 PredictionsType = Annotated[NDArray[np.float64], 3]
-GameType = Annotated[NDArray[np.int32], 3, 2]
+GameType = Annotated[NDArray[np.float64], 3, 2]
 
 ROCK = np.array([1, 0, 0])
 PAPER = np.array([0, 1, 0])
 SCISSORS = np.array([0, 0, 1])
 
 
-def computerPredict() -> PredictionsType:
-    """Function that returns a np.array of size 3 indicating the odds of each
-    option to be correct"""
-    return np.ndarray([3])
+PLAYER = 0
+TIE = 1
+COMPUTER = 2
+
+
+# def computerPredict() -> PredictionsType:
+#     """Function that returns a np.array of size 3 indicating the odds of each
+#     option to be correct"""
+#     return np.ndarray([3])
 
 
 def computerPlay(predictions: PredictionsType) -> PredictionsType:
-    """Function to return the played option (rock, paper, or scissors)"""
+    """Function to return the played option (rock, paper, or scissors) based on probabilities."""
 
-    return ROCK
+    # Randomly choose based on the probabilities in predictions
+    # options = [ROCK, PAPER, SCISSORS]
+    options = [1, 2, 3]
+    picked = np.random.choice(options, p=predictions)
+    match picked:
+        case 1:
+            return ROCK
+        case 2:
+            return PAPER
+        case 3:
+            return SCISSORS
+        case _:
+            raise ValueError("Invalid Option")
 
 
 def computerRandom() -> PredictionsType:
     return np.array([random(), random(), random()])
 
 
-def compare(arg: GameType):
-    pass
-
-
-def playSingleGame():
+def playSingleGame() -> GameType:
     """Interactively plays a single game"""
 
-    play = input("Enter your play")
-    actualPlay = np.array([0.0, 0.0, 0.0])
+    play = input("Enter your play: ")
+    playerPlay = np.array([0.0, 0.0, 0.0])
     match play:
         case "rock" | "r":
-            actualPlay[0] = 1
+            playerPlay[0] = 1
         case "paper" | "p":
-            actualPlay[1] = 1
+            playerPlay[1] = 1
         case "scissors" | "s":
-            actualPlay[2] = 1
+            playerPlay[2] = 1
         case _:
-            print("Invalid option")
-            return
+            raise ValueError("Invalid Option")
 
-    computerValue = computerPlay(ROCK)
-    # computerValue = computerPlay(computerPredict(np.array([0.33, 0.33, 0.33])))
+    computerValue = computerPlay(np.array([0.34, 0.33, 0.33]))
 
-    game = np.array([actualPlay, computerValue])
+    game = np.array([playerPlay, computerValue])
+
+    winner = determineWinner(game)
+
+    if winner == PLAYER:
+        print("You win!")
+    elif winner == COMPUTER:
+        print("You lose!")
+    else:
+        print("It's a tie!")
+
     return game
+
+
+def determineWinner(game: GameType) -> int:
+    # 0 -> player
+    # 1 -> tie
+    # 2 -> computer
+
+    playerPlay, computerValue = map(np.array, game)
+
+    match playerPlay.tolist(), computerValue.tolist():
+        case [1, 0, 0], [1, 0, 0]:
+            return TIE
+        case [1, 0, 0], [0, 1, 0]:
+            return COMPUTER
+        case [1, 0, 0], [0, 0, 1]:
+            return PLAYER
+        case [0, 1, 0], [1, 0, 0]:
+            return PLAYER
+        case [0, 1, 0], [0, 1, 0]:
+            return TIE
+        case [0, 1, 0], [0, 0, 1]:
+            return COMPUTER
+        case [0, 0, 1], [1, 0, 0]:
+            return COMPUTER
+        case [0, 0, 1], [0, 1, 0]:
+            return PLAYER
+        case [0, 0, 1], [0, 0, 1]:
+            return TIE
+        case _:
+            return TIE
 
 
 def collectData(timesPlayed: int):
     """Plays a series of games and collects data for each one"""
 
+    games = []
+
     for _ in range(timesPlayed):
         game = playSingleGame()
+        games.append(game)
 
 
 # one series:
@@ -79,7 +135,16 @@ def main():
     # TODO: replace with gameplay function
     print("Play rock paper scisors")
 
-    pass
+    allGames = []
+    # allGames = pickle.load(open("allGames.pkl", "rb"))
+
+    for i in range(5):
+        gameSeries = collectData(5)  # mabye, I think this should run in a loop
+        allGames.append(gameSeries)
+
+    pickle.dump(allGames, open("allGames.pkl", "wb"))
+
+    # calling apriori:
 
 
 if __name__ == "__main__":
