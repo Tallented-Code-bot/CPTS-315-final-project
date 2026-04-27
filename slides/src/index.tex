@@ -1,0 +1,66 @@
+
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Introduction}
+    \begin{itemize}
+        \item Rock-Paper-Scissors is not random.
+        \item Humans are not random, so given a series of games of
+        rock-paper-scissors, you can predict what moves will be played.
+        \item We do that.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Data Collection}
+% - have program to collect data
+\end{frame}
+
+\begin{frame}{Data Format}
+    \[
+    \begin{bmatrix}
+        \begin{bmatrix}
+            \begin{bmatrix}\tikzmarknode{game1a}{1} & \tikzmarknode{game1b}{0} & \tikzmarknode{game1c}{0}\end{bmatrix}, & \begin{bmatrix}\tikzmarknode{game1d}{0} & \tikzmarknode{game1e}{1} & \tikzmarknode{game1f}{0}\end{bmatrix}
+        \end{bmatrix}, \\\\
+        \begin{bmatrix}
+            \begin{bmatrix}\tikzmarknode{game2a}{0} & \tikzmarknode{game2b}{0} & \tikzmarknode{game2c}{1}\end{bmatrix}, & \begin{bmatrix}\tikzmarknode{game2d}{1} & \tikzmarknode{game2e}{0} & \tikzmarknode{game2f}{0}\end{bmatrix}
+        \end{bmatrix}
+    \end{bmatrix}
+    \]
+
+    \only<2>{
+        \begin{tikzpicture}[overlay, remember picture]
+            \draw[<-, thick, red] (game1a.north) -- ++(0, 0.5) node[above] {Rock};
+            \draw[<-, thick, red] (game1e.north) -- ++(0, 0.5) node[above] {Paper};
+            \draw[<-, thick, blue] (game2c.south) -- ++(-0.5, -0.5) node[below] {Scissors};
+            \draw[<-, thick, blue] (game2d.south) -- ++(0.5, -0.5) node[below] {Rock};
+            \draw[<-, thick, black] (game1f.east) -- ++(1, 0) node[right] {Game 1};
+            \draw[<-, thick, black] (game2f.east) -- ++(1, 0) node[right] {Game 2};
+        \end{tikzpicture}
+    }
+\end{frame}
+
+\begin{frame}{Methodology}
+\begin{itemize}
+    % \item Utilized \texttt{data\_collector.py}.
+    % \item Recorded player moves and computer responses using NumPy arrays
+    % as a datastructure.
+    % \item Stored data for subsequent mining in a python pickle.
+    \item Classifying methodology: Computer play weights are initialized as
+    pure random (.33, .33, .33).
+    \item Apriori runs, then the most frequent item is found, where item is
+    a single type of game (e.g. human plays rock, computer plays paper).
+    \item Then, depending on whether that most frequent item is a winning or
+    losing game, we update the weights of the chances for the computer to
+    play an item in proportion to the frequency of the specific game.
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Results}
+ % \begin{block}{Findings}
+ % Initial analysis shows significant bias in opening moves.
+ % \end{block}
+\end{frame}

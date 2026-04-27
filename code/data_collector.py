@@ -52,7 +52,7 @@ def computerRandom() -> PredictionsType:
 def playSingleGame() -> GameType:
     """Interactively plays a single game"""
 
-    play = input("Enter your play: ")
+    play = np.random.choice(["rock", "paper", "scissors"])
     playerPlay = np.array([0.0, 0.0, 0.0])
     match play:
         case "rock" | "r":
@@ -67,6 +67,8 @@ def playSingleGame() -> GameType:
     computerValue = computerPlay(np.array([0.34, 0.33, 0.33]))
 
     game = np.array([playerPlay, computerValue])
+
+    print(f"Player play: {playerPlay}, Computer play: {computerValue}")  # Debugging
 
     winner = determineWinner(game)
 
@@ -110,14 +112,17 @@ def determineWinner(game: GameType) -> int:
             return TIE
 
 
-def collectData(timesPlayed: int):
+def collectData(timesPlayed: int) -> list:
     """Plays a series of games and collects data for each one"""
 
-    games = []
+    games = []  # List to store games played
 
     for _ in range(timesPlayed):
-        game = playSingleGame()
-        games.append(game)
+        game = playSingleGame()  # Play a single game and collect the result
+        games.append(game)  # Append each game to the list
+        print(f"Game {_ + 1}: {game}")  # Debugging
+
+    return games  # Return the collected games
 
 
 # one series:
@@ -133,14 +138,15 @@ def collectData(timesPlayed: int):
 #
 def main():
     # TODO: replace with gameplay function
-    print("Play rock paper scisors")
+    print("Simulating Rock-Paper-Scissors games...")
 
     allGames = []
     # allGames = pickle.load(open("allGames.pkl", "rb"))
 
     for i in range(5):
-        gameSeries = collectData(5)  # mabye, I think this should run in a loop
-        allGames.append(gameSeries)
+        gameSeries = collectData(5)  # Simulate a series of 5 games
+        print(f"Game series {i + 1}: {gameSeries}")  # Debugging
+        allGames.append(gameSeries)  # Append the returned series of games
 
     pickle.dump(allGames, open("allGames.pkl", "wb"))
 
