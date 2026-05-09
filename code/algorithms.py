@@ -50,6 +50,13 @@ def apriori(minsup: int, games: List[GameType]):
 
     return all_frequent_sets
 
+def new_apriori(minsup: int, games: List[List[GameType]]):
+    C = {}
+    L = {}
+    _c = defaultdict(int)
+    for game_list in games:
+        for game in game_list:
+            for
 
 def mostFreq(games: List[GameType], minsup: int = 2) -> GameType | None:
     freq_item_sets = apriori(minsup, games)

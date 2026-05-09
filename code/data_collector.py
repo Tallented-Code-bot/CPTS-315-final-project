@@ -52,8 +52,10 @@ def computerRandom() -> PredictionsType:
 def playSingleGame() -> GameType:
     """Interactively plays a single game"""
 
-    play = np.random.choice(["rock", "paper", "scissors"])
-    playerPlay = np.array([0.0, 0.0, 0.0])
+    # play = np.random.choice(["rock", "paper", "scissors"]) #random pick fct, for debug
+    print(f"(r)ock, (p)aper, or (s)cissors")
+    play = input()
+    playerPlay = np.array([0.0, 0.0, 0.0],)
     match play:
         case "rock" | "r":
             playerPlay[0] = 1
@@ -137,7 +139,6 @@ def collectData(timesPlayed: int) -> list:
 # [ 0.5, 0,7, 0.2] (between 0 and 1, probability for rock, paper, scissors)
 #
 def main():
-    # TODO: replace with gameplay function
     print("Simulating Rock-Paper-Scissors games...")
 
     allGames = []
