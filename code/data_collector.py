@@ -8,6 +8,8 @@ from algorithms import *
 import numpy as np
 import pandas as pd
 from numpy.typing import NDArray
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 PredictionsType = Annotated[NDArray[np.float64], 3]
@@ -144,14 +146,14 @@ def main():
     print("Simulating Rock-Paper-Scissors games...")
 
     allGames = []
-    wlr = []
+    wlr = [0 for _ in range(10)]
     # allGames = pickle.load(open("allGames.pkl", "rb"))
 
     for i in range(5):
         gameSeries = collectData(5)  # Simulate a series of 5 games
-        print(f"Game series {i + 1}: {gameSeries}")  # Debugging
+        #print(f"Game series {i + 1}: {gameSeries}")  # Debugging
         allGames.append(gameSeries)  # Append the returned series of games
-        for game, index in enumerate(gameSeries):
+        for index, game in enumerate(gameSeries):
             print(game)
             if determineWinner(game) == 0:
                 wlr[i] += 1
@@ -171,7 +173,7 @@ def main():
     #print(full_games)
     freq = {}
     sup_ct = {}
-    freq, sup_ct = new_apriori(2, full_games)
+    new_apriori(2, full_games)
 
 
     plt.plot(wlr)
