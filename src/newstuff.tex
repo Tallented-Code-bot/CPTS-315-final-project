@@ -71,7 +71,7 @@ gameplay to predict the choices of a human player.
 
 \section{New Algorithm}
 
-The general architecture of this algorithm is a probabilistic choice system.For
+The general architecture of this algorithm is a probabilistic choice system. For
 each move, it employs a number of "experts" --- subroutines that attempt to
 predict what the opponent will do in a variety of ways. The main algorithm takes
 all that information, weighted over time, and uses it to pick the best move.
@@ -79,8 +79,24 @@ all that information, weighted over time, and uses it to pick the best move.
 The various "experts" are below:
 
 \begin{itemize}
-    \item
+    \item "freq" --- looks at the overall tendency that the opponent has played
+    each of rock, paper, scissors (i.e. just a global count, which decays over time)
+    \item "markov1" --- uses Markov chains of length 1 to store a list of
+    connected moves. For example, if the opponent has played rock then scissors
+    before, him playing rock now will cause markov1 to predict scissors.
+    \item "markov2" --- Uses Markov chains of length 2, very similar to markov1.
+    \item "outcome" --- uses the outcome of the game to predict what will be
+    played. For instance, if the opponent frequently plays scissors after
+    winning, it would predict scissors after winning games.
+    \item "copy" --- predicts the opponent will copy your last move
+    \item "anticopy" --- predicts the opponent will play the counter to your last move
 \end{itemize}
+
+For every game, the main algorithm calls each of the experts, gets their
+prediction, then weights it by time (so that newer games are weighted more
+heavily than older ones). Once it has the weighted prediction (i.e. a
+probability distribution of the three options), the algorithm randomly,
+according to the distribution, plays one of the three options.
 
 
 
@@ -132,7 +148,22 @@ wraps these two choices in the numpy array, and these numpy arrays are stored in
 what is called a gameSeries.
 
 The gameSeries represents each round of play, and is the level of data where
-win/loss is calculated.
+win/loss is calculated, and also the level on which the ``Most Popular Item''
+approach is implemented.
+
+The way this algorithm works, is it loops through all the games in the
+game series, and uses a hash function to match those games with a pre-determined
+game type (since there's only so many types of possible games in rock, paper, scissors).
+From this, we can determine some information about the game, including, most important
+to us in this method, whether the most frequent game in the last round was a ``winning'',
+or a ``losing'' game.
+
+If the game is determined to be a ``winning'' game, we increase the odds of the computer
+able to roll that move, by a factor of the ``learning rate'', which doesn't function
+like a typical learning rate, and instead, is simply the number of percentage points we
+add or subtract from the likelyhood that number gets picked. The other two numbers in the
+array are decreased or increased, in equal ammounts, opposite of the direction the most
+frequent item went.
 
 After all the games are played, and the win/loss ratio to view the data.
 We also need to remember here to store our data back into the Python pickle to
@@ -150,3 +181,16 @@ opponent is taking into account).
 
 
 \section{Results and Discussion}
+As mentioned before, we had originally planned to implement the Apriori
+algorithm to be able to get multiple most frequent itemsets. However, this
+proved to be not only very difficult to implement, due to the shape of our data,
+but also unnecessary.
+
+As the project went on, it became increasingly difficult to justify the time taken
+to get the algorithm to work, due to its limited percieved success compared to a simpler
+system that only retrieved the most frequent item in a set. Apriori gets the most frequent
+combinations of itemsets, but this information seemed irrelevant, so we decided to abandon
+this method in favor of our simpler approach.
+
+The ``Most Popular Item'', going up against another computer who chose random every time,
+saw limited success.

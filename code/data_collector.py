@@ -242,19 +242,7 @@ def main():
         determine_most_freq(mostFreq, computerOdds)
 
     pickle.dump(allGames, open("allGames.pkl", "wb"))
-
-    # calling apriori:
-    full_games = []
-
-    for series in allGames:
-        for game in series:
-            full_games.append(game[0].tolist() + game[1].tolist())
-    # print(full_games)
-    freq = {}
-    sup_ct = {}
-    # new_apriori(2, full_games)
-
-    plt.plot(wlr)
+        plt.plot(wlr)
     plt.show()
 
 
