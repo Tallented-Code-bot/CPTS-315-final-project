@@ -4,6 +4,9 @@
 Everything is in this repo, including code, slides, and LaTeX source files.
 
 
+[Final Report PDF](https://github.com/Tallented-Code-bot/CPTS-315-final-project/blob/main/CPTS_315_Final_Report.pdf)
+
+
 
 
 
