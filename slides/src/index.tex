@@ -9,15 +9,24 @@
         \item Rock-Paper-Scissors is not random.
         \item Humans are not random, so given a series of games of
         rock-paper-scissors, you can predict what moves will be played.
-        \item We do that.
+        % \item We do that.
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Data Collection}
     \begin{itemize}
-        \item As the user plays, results of played games are collected
-        and stored after a certain given number of games.
-        \item Each set of games is stored as a series.
+        \item There's no data we could find on rock-paper-scissors games
+        \item We have a program to collect our own data.
+
+        \item The user plays a series of games against a random opponent.
+        \item We collect the games and store them for later processing.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Data Format}
+    \begin{itemize}
+        \item We store games as 2d arrays, with each play stored as a 3-element array.
+        \item We store series of games from the same session in lists.
     \end{itemize}
 \end{frame}
 
@@ -47,10 +56,6 @@
 
 \begin{frame}{Methodology}
 \begin{itemize}
-    % \item Utilized \texttt{data\_collector.py}.
-    % \item Recorded player moves and computer responses using NumPy arrays
-    % as a datastructure.
-    % \item Stored data for subsequent mining in a python pickle.
     \item Classifying methodology: Computer play weights are initialized as
     pure random (.33, .33, .33).
     \item Apriori runs, then the most frequent item is found, where item is
@@ -70,4 +75,8 @@
     little to no improvement over random, however as we continue to implement our design,
     this is sure to change.
  % \end{block}
+\end{frame}
+
+\begin{frame}{Conclusion}
+    Any questions?
 \end{frame}

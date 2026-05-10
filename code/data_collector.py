@@ -3,14 +3,15 @@ import pickle
 from random import random
 from typing import Annotated
 
+import matplotlib
 
-from algorithms import *
+# matplotlib.use()
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from algorithms import *
+from numpy.ma import maximum
 from numpy.typing import NDArray
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 
 PredictionsType = Annotated[NDArray[np.float64], 3]
 GameType = Annotated[NDArray[np.float64], 3, 2]
@@ -23,6 +24,8 @@ SCISSORS = np.array([0, 0, 1])
 PLAYER = 0
 TIE = 1
 COMPUTER = 2
+
+NUM_GAMES = 20
 
 
 # def computerPredict() -> PredictionsType:
@@ -53,13 +56,15 @@ def computerRandom() -> PredictionsType:
     return np.array([random(), random(), random()])
 
 
-def playSingleGame() -> GameType:
+def playSingleGame(computerOdds: NDArray) -> GameType:
     """Interactively plays a single game"""
 
-    play = np.random.choice(["rock", "paper", "scissors"]) #random pick fct, for debug
+    play = np.random.choice(["rock", "paper", "scissors"])  # random pick fct, for debug
     # print(f"(r)ock, (p)aper, or (s)cissors")
     # play = input()
-    playerPlay = np.array([0.0, 0.0, 0.0],)
+    playerPlay = np.array(
+        [0.0, 0.0, 0.0],
+    )
     match play:
         case "rock" | "r":
             playerPlay[0] = 1
@@ -70,7 +75,7 @@ def playSingleGame() -> GameType:
         case _:
             raise ValueError("Invalid Option")
 
-    computerValue = computerPlay(np.array([0.34, 0.33, 0.33]))
+    computerValue = computerPlay(computerOdds)
 
     game = np.array([playerPlay, computerValue])
 
@@ -118,13 +123,72 @@ def determineWinner(game: GameType) -> int:
             return TIE
 
 
-def collectData(timesPlayed: int) -> list:
+def determine_most_freq(game: GameType, computerOdds: NDArray) -> int:
+    # 0 -> player
+    # 1 -> tie
+    # 2 -> computer
+    LEARNING_RATE = 0.2  # just a defualt,
+
+    match game:
+        case [1, 0, 0, 1, 0, 0]:
+            return TIE
+        case [1, 0, 0, 0, 1, 0]:
+            computerOdds[0] += LEARNING_RATE
+            computerOdds[0] = min(1.0, computerOdds[0])
+            remaining = 1.0 - computerOdds[0]
+            computerOdds[1] = remaining / 2
+            computerOdds[2] = remaining / 2
+            return COMPUTER
+        case [1, 0, 0, 0, 0, 1]:
+            computerOdds[0] -= LEARNING_RATE
+            computerOdds[0] = max(0.0, computerOdds[0])
+            remaining = 1.0 - computerOdds[0]
+            computerOdds[1] = remaining / 2
+            computerOdds[2] = remaining / 2
+            return PLAYER
+        case [0, 1, 0, 1, 0, 0]:
+            computerOdds[1] -= LEARNING_RATE
+            computerOdds[1] = max(0.0, computerOdds[1])
+            remaining = 1.0 - computerOdds[1]
+            computerOdds[0] = remaining / 2
+            computerOdds[2] = remaining / 2
+            return PLAYER
+        case [0, 1, 0, 0, 1, 0]:
+            return TIE
+        case [0, 1, 0, 0, 0, 1]:
+            computerOdds[1] += LEARNING_RATE
+            computerOdds[1] = min(1.0, computerOdds[1])
+            remaining = 1.0 - computerOdds[1]
+            computerOdds[0] = remaining / 2
+            computerOdds[2] = remaining / 2
+            return COMPUTER
+        case [0, 0, 1, 1, 0, 0]:
+            computerOdds[2] += LEARNING_RATE
+            computerOdds[2] = min(1.0, computerOdds[2])
+            remaining = 1.0 - computerOdds[2]
+            computerOdds[1] = remaining / 2
+            computerOdds[0] = remaining / 2
+            return COMPUTER
+        case [0, 0, 1, 0, 1, 0]:
+            computerOdds[2] -= LEARNING_RATE
+            computerOdds[2] = max(0.0, computerOdds[2])
+            remaining = 1.0 - computerOdds[2]
+            computerOdds[1] = remaining / 2
+            computerOdds[0] = remaining / 2
+            return PLAYER
+        case [0, 0, 1, 0, 0, 1]:
+            return TIE
+        case _:
+            return TIE
+
+
+def collectData(timesPlayed: int, computerOdds: NDArray) -> list:
     """Plays a series of games and collects data for each one"""
 
     games = []  # List to store games played
 
     for _ in range(timesPlayed):
-        game = playSingleGame()  # Play a single game and collect the result
+        game = playSingleGame(computerOdds)  # Play a single game and collect the result
         games.append(game)  # Append each game to the list
         print(f"Game {_ + 1}: {game}")  # Debugging
 
@@ -142,42 +206,57 @@ def collectData(timesPlayed: int) -> list:
 # prediction array
 # [ 0.5, 0,7, 0.2] (between 0 and 1, probability for rock, paper, scissors)
 #
+
+NUM_ROUNDS = 100
+
+
 def main():
     print("Simulating Rock-Paper-Scissors games...")
 
     allGames = []
-    wlr = [0 for _ in range(10)]
+
+    computerOdds = np.array([0.34, 0.33, 0.33])
+
+    with open("allGames.pkl", "rb") as file:
+        allGames = pickle.load(file)
+
+    wlr = [0 for _ in range(NUM_ROUNDS)]
     # allGames = pickle.load(open("allGames.pkl", "rb"))
 
-    for i in range(5):
-        gameSeries = collectData(5)  # Simulate a series of 5 games
-        #print(f"Game series {i + 1}: {gameSeries}")  # Debugging
+    for i in range(NUM_ROUNDS):
+        gameSeries = collectData(
+            NUM_GAMES, computerOdds
+        )  # Simulate a series of 5 games
+        # print(f"Game series {i + 1}: {gameSeries}")  # Debugging
         allGames.append(gameSeries)  # Append the returned series of games
         for index, game in enumerate(gameSeries):
             print(game)
             if determineWinner(game) == 0:
                 wlr[i] += 1
-            elif determineWinner(game) == 2: 
+            elif determineWinner(game) == 2:
                 wlr[i] -= 1
+        full_games = []
+        for game in gameSeries:
+            full_games.append(game[0].tolist() + game[1].tolist())
+        mostFreq = get_game(most_picked(full_games))
+        determine_most_freq(mostFreq, computerOdds)
 
     pickle.dump(allGames, open("allGames.pkl", "wb"))
 
     # calling apriori:
-    com_games = []
-    player_games = []
     full_games = []
-    
+
     for series in allGames:
         for game in series:
             full_games.append(game[0].tolist() + game[1].tolist())
-    #print(full_games)
+    # print(full_games)
     freq = {}
     sup_ct = {}
-    new_apriori(2, full_games)
-
+    # new_apriori(2, full_games)
 
     plt.plot(wlr)
     plt.show()
+
 
 if __name__ == "__main__":
     main()
