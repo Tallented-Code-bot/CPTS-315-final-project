@@ -1,5 +1,12 @@
 # CPTS 315 Final Project
 
+
+Everything is in this repo, including code, slides, and LaTeX source files.
+
+
+
+
+
 ## Requirements (copied from syllabus)
 
 1. Team: Students form their teams, but the instructor reserves the right to
