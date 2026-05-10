@@ -3,10 +3,12 @@ import pickle
 from random import random
 from typing import Annotated
 
-import algorithms
+
+from algorithms import *
 import numpy as np
 import pandas as pd
 from numpy.typing import NDArray
+import matplotlib.pyplot as plt
 
 PredictionsType = Annotated[NDArray[np.float64], 3]
 GameType = Annotated[NDArray[np.float64], 3, 2]
@@ -52,9 +54,9 @@ def computerRandom() -> PredictionsType:
 def playSingleGame() -> GameType:
     """Interactively plays a single game"""
 
-    # play = np.random.choice(["rock", "paper", "scissors"]) #random pick fct, for debug
-    print(f"(r)ock, (p)aper, or (s)cissors")
-    play = input()
+    play = np.random.choice(["rock", "paper", "scissors"]) #random pick fct, for debug
+    # print(f"(r)ock, (p)aper, or (s)cissors")
+    # play = input()
     playerPlay = np.array([0.0, 0.0, 0.0],)
     match play:
         case "rock" | "r":
@@ -142,17 +144,38 @@ def main():
     print("Simulating Rock-Paper-Scissors games...")
 
     allGames = []
+    wlr = []
     # allGames = pickle.load(open("allGames.pkl", "rb"))
 
     for i in range(5):
         gameSeries = collectData(5)  # Simulate a series of 5 games
         print(f"Game series {i + 1}: {gameSeries}")  # Debugging
         allGames.append(gameSeries)  # Append the returned series of games
+        for game, index in enumerate(gameSeries):
+            print(game)
+            if determineWinner(game) == 0:
+                wlr[i] += 1
+            elif determineWinner(game) == 2: 
+                wlr[i] -= 1
 
     pickle.dump(allGames, open("allGames.pkl", "wb"))
 
     # calling apriori:
+    com_games = []
+    player_games = []
+    full_games = []
+    
+    for series in allGames:
+        for game in series:
+            full_games.append(game[0].tolist() + game[1].tolist())
+    #print(full_games)
+    freq = {}
+    sup_ct = {}
+    freq, sup_ct = new_apriori(2, full_games)
 
+
+    plt.plot(wlr)
+    plt.show()
 
 if __name__ == "__main__":
     main()

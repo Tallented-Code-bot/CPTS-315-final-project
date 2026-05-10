@@ -50,13 +50,98 @@ def apriori(minsup: int, games: List[GameType]):
 
     return all_frequent_sets
 
-def new_apriori(minsup: int, games: List[List[GameType]]):
+def print_table(T, supp_count):
+    print("Itemset | Frequency")
+    for k in range(len(T)):
+        print("{} : {}", format(T[k], supp_count[k]))
+    print("\n\n")
+
+
+def count_occurances(itemset, Transactions):
+    count = 0
+    for i in range(len(Transactions)):
+        if set(itemset).issubset(set(Transactions[i])):
+            count += 1
+    return count
+
+
+def join_two_itemsets(it1, it2, order):
+    it1.sort(key=lambda x: order.index(x))
+    it2.sort(key=lambda x: order.index(x))
+
+    for i in range(len(it1)-1):
+        if it1[i] != it2[i]:
+            return []
+
+    if order.index(it1[-1]) < order.index(it2[-1]):
+        return it1 + [it2[-1]]
+
+    return []
+
+def join_set_itemsets(set_of_its, order):
+    C = []
+    for i in range(len(set_of_its)):
+        for j in range(i+1, len(set_of_its)):
+            it_out = join_two_itemsets(set_of_its[i], set_of_its[j], order)
+            if len(it_out) > 0:
+                C.append(it_out)
+    return C
+            
+
+def get_frequent(itemsets, Transactions, minsup, prev_discarded):
+    L = [] #list to store freq_itemsets
+    supp_count = [] #counts of itemsets
+    new_discarded = [] #items we discard in this itteration
+    num_transactions = len(Transactions)
+    k = len(prev_discarded.keys())
+
+    for s in range(len(itemsets)):
+        #check if item contains previously discarded itemset
+        discarded_before = False
+        if k > 0:
+            for it in prev_discarded[k]:
+                if set(it).issubset(set(itesmsets[s])):
+                    discarded_before = True
+                    break
+        if not discarded_before:
+            count = count_occurances(itemsets[s], Transactions)
+            if count/num_transactions >= minsup:
+                L.append(itemsets[s])
+                supp_count.append(count)
+            else:       
+                new_discarded.append(itemsets[s])
+    return L, supp_count, new_discarded
+
+def new_apriori(minsup: int, games: List[float]):
+    order = [[1., 0., 0., 1., 0., 0.], [1., 0., 0., 0., 1., 0.], [1., 0., 0., 0., 0., 1.], [0., 1., 0., 1., 0., 0.], [0., 1., 0., 0., 1., 0.], [0., 1., 0., 0., 0., 1.], [0., 0., 1., 1., 0., 0.], [0., 0., 1., 0., 1., 0.], [0., 0., 1., 0., 0., 1.]]
+    order = [tuple(x) for x in order]
     C = {}
     L = {}
-    _c = defaultdict(int)
-    for game_list in games:
-        for game in game_list:
-            for
+    itemset_size = 1
+    Discarded = {itemset_size: []}
+    C.update({itemset_size: [ tuple(f) for f in order]})
+    #this should be C_1
+
+    supp_count_L = {} #idk why dictionary
+    f, sup, new_discarded = get_frequent(C[itemset_size], games, minsup, Discarded)
+    Discarded.update({itemset_size : new_discarded})
+    L.update({itemset_size : f})
+    supp_count_L.update({itemset_size : sup}) 
+
+    k = itemset_size + 1
+    convergence = 0
+    while not convergence:
+        C.update({k : join_set_itemsets(L[k-1], order)})
+        print("Table C{}: \n".format(k))
+        print_table(C[k], [count_occurances(it, games) for it in C[k]])
+        f, sup, new_discarded = get_frequent(C[k], games, minsup, Discarded)
+        Discarded.update({k : new_discarded})
+        L.update({k : f})
+        supp_count_L.update({k : sup})
+        if len(L[k]) == 0:
+            convergence = True
+        k += 1
+
 
 def mostFreq(games: List[GameType], minsup: int = 2) -> GameType | None:
     freq_item_sets = apriori(minsup, games)
